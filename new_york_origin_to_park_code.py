@@ -1,6 +1,40 @@
 import osmnx as ox
 %matplotlib inline
 import networkx as nx
+import pandas as pd
+import io
+import requests
+import xlrd
+
+
+
+##below is uploading the NY data
+################################################################
+
+url = "https://www2.census.gov/geo/docs/reference/cenpop2010/blkgrp/CenPop2010_Mean_BG36.txt"
+c = pd.read_csv(url)
+c['COUNTYFP'] = c['COUNTYFP'].apply('{0:0>3}'.format)
+c['TRACTCE'] = c['TRACTCE'].apply('{0:0>6}'.format)
+c = c.astype(str)
+c['POPULATION'] = c['STATEFP'] + c['COUNTYFP'] + c['TRACTCE'] + c['BLKGRPCE']
+c=c.drop('COUNTYFP',axis = 1)
+c=c.drop('STATEFP',axis = 1)
+c=c.drop('TRACTCE',axis = 1)
+c=c.drop('BLKGRPCE',axis = 1)
+c['LATITUDE'] = c['LATITUDE'].astype(float)
+c['LONGITUDE'] = c['LONGITUDE'].astype(float)
+
+
+
+print(c)
+
+c2 = c[['LATITUDE','LONGITUDE']]
+c3 = c2[1:4]
+print(c3)
+
+
+##below is the code to start calculating distance between points
+################################################################
 B = ox.graph_from_point((40.73077, -73.935076), distance=2000, network_type='drive')
 #the above is calvary cemetary at NeW York, New York
 
