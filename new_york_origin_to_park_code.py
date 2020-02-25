@@ -4,7 +4,7 @@ import networkx as nx
 import pandas as pd
 import io
 import requests
-import xlrd
+
 
 
 
@@ -17,6 +17,7 @@ c['COUNTYFP'] = c['COUNTYFP'].apply('{0:0>3}'.format)
 c['TRACTCE'] = c['TRACTCE'].apply('{0:0>6}'.format)
 c = c.astype(str)
 c['POPULATION'] = c['STATEFP'] + c['COUNTYFP'] + c['TRACTCE'] + c['BLKGRPCE']
+c.rename(columns = {'POPULATION':'BLOCKNUMBER'}, inplace=True)
 c=c.drop('COUNTYFP',axis = 1)
 c=c.drop('STATEFP',axis = 1)
 c=c.drop('TRACTCE',axis = 1)
@@ -32,11 +33,24 @@ c2 = c[['LATITUDE','LONGITUDE']]
 c3 = c2[1:4]
 print(c3)
 
+xstart = c3.iat[0,0]
+ystart = c3.iat[0,1]
+B = ox.graph_from_point((xstart, ystart), distance=2000, network_type='drive')
+#origin = ox.get_nearest_node(B, (xstart, ystart))
+#destination = ox.get_nearest_node(B, (xend, yend))
 
+fig, ax = ox.plot_graph(ox.project_graph(B))
+##notice this above destination is not in New York City... 
+
+
+'''
 ##below is the code to start calculating distance between points
 ################################################################
 B = ox.graph_from_point((40.73077, -73.935076), distance=2000, network_type='drive')
-#the above is calvary cemetary at NeW York, New York
+##the above is calvary cemetary at NeW York, New York
+##For the real simulation, load "B" as the entire city of New York.
+##This will be this below code:
+#B = ox.graph_from_place('New York, New York, USA', network_type='drive')
 
 ##read in the file of lat/long points
 ##store origin values of lat. as xstart, and long. as ystart
@@ -52,3 +66,4 @@ bbox = ox.bbox_from_point((40.73077, -73.935076), distance=2000, project_utm=Tru
 B_proj = ox.project_graph(B)
 route = nx.shortest_path(B_proj, source=origin, target=destination, weight='length')
 fig, ax = ox.plot_graph_route(B_proj, route, bbox=bbox, node_size=0)
+'''
