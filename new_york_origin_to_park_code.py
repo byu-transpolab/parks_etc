@@ -1,15 +1,12 @@
+
 import osmnx as ox
 %matplotlib inline
 import networkx as nx
+
+import numpy as np
 import pandas as pd
 import io
 import requests
-
-
-
-
-##below is uploading the NY data
-################################################################
 
 url = "https://www2.census.gov/geo/docs/reference/cenpop2010/blkgrp/CenPop2010_Mean_BG36.txt"
 c = pd.read_csv(url)
@@ -27,20 +24,36 @@ c['LONGITUDE'] = c['LONGITUDE'].astype(float)
 
 
 
+
 print(c)
 
 c2 = c[['LATITUDE','LONGITUDE']]
-c3 = c2[1:4]
+c3 = c2[500:505]
 print(c3)
 
-xstart = c3.iat[0,0]
-ystart = c3.iat[0,1]
-B = ox.graph_from_point((xstart, ystart), distance=2000, network_type='drive')
-#origin = ox.get_nearest_node(B, (xstart, ystart))
-#destination = ox.get_nearest_node(B, (xend, yend))
 
-fig, ax = ox.plot_graph(ox.project_graph(B))
-##notice this above destination is not in New York City... 
+##block time
+############################################################
+xstart = c2.iat[500,0]
+ystart = c2.iat[500,1]
+B = ox.graph_from_place('New York, New York, USA', network_type='drive')
+#B = ox.graph_from_point((xstart, ystart), distance=2000, network_type='drive')
+origin = ox.get_nearest_node(B, (xstart, ystart))
+xend = 40.731456
+yend = -73.770367
+destination = ox.get_nearest_node(B, (xend, yend))
+
+bbox = ox.bbox_from_point((xend, yend), distance=15000, project_utm=True)
+#this lat/long needs to be the same value as map "B" notated above
+B_proj = ox.project_graph(B)
+route = nx.shortest_path(B_proj, source=origin, target=destination, weight='length')
+fig, ax = ox.plot_graph_route(B_proj, route, bbox=bbox, node_size=0)
+#fig, ax = ox.plot_graph(ox.project_graph(B))
+
+route_lengths = ox.get_route_edge_attributes(B_proj, route, 'length')
+print('Total trip distance: {:,.0f} meters'.format(np.sum(route_lengths)))
+gg = np.sum(route_lengths)
+print(gg)
 
 
 '''
