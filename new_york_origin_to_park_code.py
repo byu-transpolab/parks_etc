@@ -78,6 +78,8 @@ result['LONGITUDE'] = result['LONGITUDE'].astype(float)
 #print('\n')
 #print(result.shape[0])
 print('__________________________________________________________\n')
+B = ox.graph_from_place('New York, New York, USA', network_type='drive')
+B_proj = ox.project_graph(B)
 
 u = pd.read_csv('the_data.csv')
 #print(u)
