@@ -89,7 +89,8 @@ u['longitude'] = u['longitude'].astype(float)
 
 col_names = []
 qqq = result.shape[0]
-for name in range(0,qqq):
+qqqq = int(qqq)
+for name in range(0,qqqq):
     b = result.iat[name,0]
     col_names.append(b)
 
@@ -167,5 +168,27 @@ for jiber in range(1,rowz):
             route_lengths = ox.get_route_edge_attributes(B_proj, route, 'length')
             aa = np.sum(route_lengths)
             treasure.iat[counter,tt] = aa
+
+
+tre = pd.melt(treasure)
+#print(tre)
+
+idx = 0
+new_array = []
+how_long = tre.shape[0]/len(rows)
+how_longi = int(how_long)
+for jimmy in range(0,how_longi):
+    for h in range(0,len(rows)):
+        new_array.append(rows[h])
+#print(new_array)
+new_col = new_array
+tre.insert(loc=idx, column='Park_ID', value=new_col)
+
+tre.rename(columns = {'variable':'Block_ID'}, inplace=True)
+tre.rename(columns = {'value':'Distance'}, inplace=True)
+#print(tre)
+
+tre.to_csv('distance_data', sep='\t')
+
 
 #print(treasure)
